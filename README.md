@@ -1,4 +1,5 @@
-<!-- HEADER IMAGE: hosted outside the repo, URL added at publish -->
+<img width="1280" height="320" alt="B2_tiled_8x2_white_7px" src="https://github.com/user-attachments/assets/1284012a-071c-4efd-8076-9442b8c4c066" />
+
 
 # ComfyUI-Marigold-V2-Tiled-Depth-Vathography
 
