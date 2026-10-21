@@ -1,0 +1,14 @@
+[project]
+name = "comfyui-marigold-v2-tiled-depth-vathography"
+description = "Tiled Marigold V2 depth for ComfyUI by Vathography: full-resolution depth maps from large photographs, on ComfyUI's native Marigold V2, with no extra installation."
+version = "1.0.0"
+license = { file = "LICENSE" }
+dependencies = ["kornia"]
+
+[project.urls]
+Repository = "https://github.com/vathography/ComfyUI-Marigold-V2-Tiled-Depth-Vathography"
+
+[tool.comfy]
+PublisherId = "vathography"
+DisplayName = "Marigold V2 Tiled Depth - Vathography"
+requires-comfyui = ">=0.36.0"

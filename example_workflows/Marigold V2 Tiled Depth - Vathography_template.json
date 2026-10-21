@@ -1,0 +1,787 @@
+{
+  "id": "5b68a35f-2453-477d-803b-0ef219056f84",
+  "revision": 0,
+  "last_node_id": 12,
+  "last_link_id": 18,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "LoadImage",
+      "pos": [
+        649.5056321132365,
+        -135.61497600787555
+      ],
+      "size": [
+        330.2439396437761,
+        333.01291995408985
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "COMBO",
+          "widget": {
+            "name": "image"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "choose file to upload",
+          "name": "upload",
+          "type": "IMAGEUPLOAD",
+          "widget": {
+            "name": "upload"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "IMAGE",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            13
+          ]
+        },
+        {
+          "localized_name": "MASK",
+          "name": "MASK",
+          "type": "MASK",
+          "links": []
+        }
+      ],
+      "title": "Photo",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.39.2",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "ev_suv_gold_desert_pavilion.png",
+        "image"
+      ]
+    },
+    {
+      "id": 8,
+      "type": "SaveImageAdvanced",
+      "pos": [
+        1495.9386152551028,
+        246.5603682746814
+      ],
+      "size": [
+        343.83463612326955,
+        150
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "link": 17
+        },
+        {
+          "localized_name": "filename_prefix",
+          "name": "filename_prefix",
+          "type": "STRING",
+          "widget": {
+            "name": "filename_prefix"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "format",
+          "name": "format",
+          "type": "COMFY_DYNAMICCOMBO_V3",
+          "widget": {
+            "name": "format"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "bit_depth",
+          "name": "format.bit_depth",
+          "type": "COMBO",
+          "widget": {
+            "name": "format.bit_depth"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "input_color_space",
+          "name": "format.input_color_space",
+          "type": "COMBO",
+          "widget": {
+            "name": "format.input_color_space"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "links": null
+        }
+      ],
+      "title": "Save depth (EXR, linear)",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.39.2",
+        "Node name for S&R": "SaveImageAdvanced"
+      },
+      "widgets_values": [
+        "marigold_tiled_depth",
+        "exr",
+        "32-bit float",
+        "linear"
+      ]
+    },
+    {
+      "id": 9,
+      "type": "PreviewImage",
+      "pos": [
+        1499.2473101322057,
+        440.92299686551667
+      ],
+      "size": [
+        340,
+        330
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "link": 18
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.39.2",
+        "Node name for S&R": "PreviewImage"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 10,
+      "type": "MarkdownNote",
+      "pos": [
+        664.8617137093979,
+        466.0599468571231
+      ],
+      "size": [
+        579.1730733447964,
+        256.8422383197849
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "## Marigold V2 Tiled Depth - Vathography\n\nLoad a photograph in the **Photo** node, then run.\n\nThe depth map (0 to 1, near = bright, far = dark) is saved as a 32-bit EXR with the linear color space.\n\n**Official model source:** [Comfy-Org/marigold-v2-0](https://huggingface.co/Comfy-Org/marigold-v2-0)\n\nModels are placed in these directories, inside `ComfyUI/models/`:\n\n- diffusion_models/qwen_image_edit_2509_int8_convrot.safetensors\n- loras/marigold_v2_depth_log_stage2.safetensors\n- vae/marigold_v2_depth_log_stage2_vae.safetensors\n- embeddings/marigold_v2_depth_conditioning.safetensors\n\nLicense: AGPL-3.0-only. The \"Marigold V2 Tiled Depth - Vathography\" node has been released for free, and the depth maps it produces are free to use for commercial work.\n"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 11,
+      "type": "376fc199-9fd2-4e99-8f0e-3738db30b672",
+      "pos": [
+        653.7490950274326,
+        264.2763267977263
+      ],
+      "size": [
+        325.9793907108997,
+        111.960758717467
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "localized_name": "MODEL",
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            14
+          ]
+        },
+        {
+          "localized_name": "VAE",
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            15
+          ]
+        },
+        {
+          "localized_name": "CONDITIONING",
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            16
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.39.2",
+        "previewExposures": []
+      }
+    },
+    {
+      "id": 12,
+      "type": "VathographyMarigoldTiledDepth",
+      "pos": [
+        1079.002973303726,
+        245.81766632434207
+      ],
+      "size": [
+        339.45227146206935,
+        112.74925675049337
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "IMAGE",
+          "link": 13
+        },
+        {
+          "localized_name": "model",
+          "name": "model",
+          "type": "MODEL",
+          "link": 14
+        },
+        {
+          "localized_name": "vae",
+          "name": "vae",
+          "type": "VAE",
+          "link": 15
+        },
+        {
+          "localized_name": "conditioning",
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 16
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "depth",
+          "name": "depth",
+          "type": "IMAGE",
+          "links": [
+            17,
+            18
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VathographyMarigoldTiledDepth"
+      }
+    }
+  ],
+  "links": [
+    [
+      13,
+      1,
+      0,
+      12,
+      0,
+      "IMAGE"
+    ],
+    [
+      14,
+      11,
+      0,
+      12,
+      1,
+      "MODEL"
+    ],
+    [
+      15,
+      11,
+      1,
+      12,
+      2,
+      "VAE"
+    ],
+    [
+      16,
+      11,
+      2,
+      12,
+      3,
+      "CONDITIONING"
+    ],
+    [
+      18,
+      12,
+      0,
+      9,
+      0,
+      "IMAGE"
+    ],
+    [
+      17,
+      12,
+      0,
+      8,
+      0,
+      "IMAGE"
+    ]
+  ],
+  "groups": [],
+  "definitions": {
+    "subgraphs": [
+      {
+        "id": "376fc199-9fd2-4e99-8f0e-3738db30b672",
+        "version": 1,
+        "state": {
+          "lastGroupId": 0,
+          "lastNodeId": 12,
+          "lastLinkId": 18,
+          "lastRerouteId": 0
+        },
+        "revision": 0,
+        "config": {},
+        "name": "Marigold V2 Models",
+        "inputNode": {
+          "id": -10,
+          "bounding": [
+            -392.32024248103113,
+            434.066572172953,
+            128,
+            48
+          ]
+        },
+        "outputNode": {
+          "id": -20,
+          "bounding": [
+            1087.4199863422364,
+            405.0546212074108,
+            137.267578125,
+            108
+          ]
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "id": "7d1e8bfe-3c19-4631-b684-6484b44e6590",
+            "name": "MODEL",
+            "type": "MODEL",
+            "linkIds": [
+              3
+            ],
+            "localized_name": "MODEL",
+            "pos": [
+              1111.4199863422364,
+              429.0546212074108
+            ]
+          },
+          {
+            "id": "eb9427bd-e593-4b7b-9623-10691ad9ae01",
+            "name": "VAE",
+            "type": "VAE",
+            "linkIds": [
+              5
+            ],
+            "localized_name": "VAE",
+            "pos": [
+              1111.4199863422364,
+              449.0546212074108
+            ]
+          },
+          {
+            "id": "0d483191-7a56-4a56-8f0a-9f5fc6033583",
+            "name": "CONDITIONING",
+            "type": "CONDITIONING",
+            "linkIds": [
+              6
+            ],
+            "localized_name": "CONDITIONING",
+            "pos": [
+              1111.4199863422364,
+              469.0546212074108
+            ]
+          }
+        ],
+        "widgets": [],
+        "nodes": [
+          {
+            "id": 2,
+            "type": "UNETLoader",
+            "pos": [
+              -204.32024248103113,
+              315.44980814584636
+            ],
+            "size": [
+              380,
+              90
+            ],
+            "flags": {},
+            "order": 0,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "unet_name",
+                "name": "unet_name",
+                "type": "COMBO",
+                "widget": {
+                  "name": "unet_name"
+                },
+                "link": null
+              },
+              {
+                "localized_name": "weight_dtype",
+                "name": "weight_dtype",
+                "type": "COMBO",
+                "widget": {
+                  "name": "weight_dtype"
+                },
+                "link": null
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "MODEL",
+                "name": "MODEL",
+                "type": "MODEL",
+                "links": [
+                  1
+                ]
+              }
+            ],
+            "properties": {
+              "cnr_id": "comfy-core",
+              "ver": "0.39.2",
+              "Node name for S&R": "UNETLoader",
+              "models": [
+                {
+                  "name": "qwen_image_edit_2509_int8_convrot.safetensors",
+                  "url": "https://huggingface.co/Comfy-Org/marigold-v2-0/resolve/main/diffusion_models/qwen_image_edit_2509_int8_convrot.safetensors",
+                  "directory": "diffusion_models"
+                }
+              ]
+            },
+            "widgets_values": [
+              "qwen_image_edit_2509_int8_convrot.safetensors",
+              "default"
+            ]
+          },
+          {
+            "id": 3,
+            "type": "LoraLoaderModelOnly",
+            "pos": [
+              209.65385861143608,
+              313.0395075821861
+            ],
+            "size": [
+              380,
+              90
+            ],
+            "flags": {},
+            "order": 3,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "model",
+                "name": "model",
+                "type": "MODEL",
+                "link": 1
+              },
+              {
+                "localized_name": "lora_name",
+                "name": "lora_name",
+                "type": "COMBO",
+                "widget": {
+                  "name": "lora_name"
+                },
+                "link": null
+              },
+              {
+                "localized_name": "strength_model",
+                "name": "strength_model",
+                "type": "FLOAT",
+                "widget": {
+                  "name": "strength_model"
+                },
+                "link": null
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "MODEL",
+                "name": "MODEL",
+                "type": "MODEL",
+                "links": [
+                  2
+                ]
+              }
+            ],
+            "properties": {
+              "cnr_id": "comfy-core",
+              "ver": "0.39.2",
+              "Node name for S&R": "LoraLoaderModelOnly",
+              "models": [
+                {
+                  "name": "marigold_v2_depth_log_stage2.safetensors",
+                  "url": "https://huggingface.co/Comfy-Org/marigold-v2-0/resolve/main/loras/marigold_v2_depth_log_stage2.safetensors",
+                  "directory": "loras"
+                }
+              ]
+            },
+            "widgets_values": [
+              "marigold_v2_depth_log_stage2.safetensors",
+              1
+            ]
+          },
+          {
+            "id": 4,
+            "type": "ModelSamplingAuraFlow",
+            "pos": [
+              646.8102155369959,
+              314.4836124400929
+            ],
+            "size": [
+              375.3303589715724,
+              94.4462448399384
+            ],
+            "flags": {},
+            "order": 4,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "model",
+                "name": "model",
+                "type": "MODEL",
+                "link": 2
+              },
+              {
+                "localized_name": "shift",
+                "name": "shift",
+                "type": "FLOAT",
+                "widget": {
+                  "name": "shift"
+                },
+                "link": null
+              },
+              {
+                "localized_name": "sampling",
+                "name": "sampling",
+                "shape": 7,
+                "type": "COMBO",
+                "widget": {
+                  "name": "sampling"
+                },
+                "link": null
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "MODEL",
+                "name": "MODEL",
+                "type": "MODEL",
+                "links": [
+                  3
+                ]
+              }
+            ],
+            "properties": {
+              "cnr_id": "comfy-core",
+              "ver": "0.39.2",
+              "Node name for S&R": "ModelSamplingAuraFlow"
+            },
+            "widgets_values": [
+              1.73,
+              "img_to_img_velocity"
+            ]
+          },
+          {
+            "id": 6,
+            "type": "VAELoader",
+            "pos": [
+              646.21480656073,
+              461.3695488393041
+            ],
+            "size": [
+              380,
+              60
+            ],
+            "flags": {},
+            "order": 1,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "vae_name",
+                "name": "vae_name",
+                "type": "COMBO",
+                "widget": {
+                  "name": "vae_name"
+                },
+                "link": null
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "VAE",
+                "name": "VAE",
+                "type": "VAE",
+                "links": [
+                  5
+                ]
+              }
+            ],
+            "properties": {
+              "cnr_id": "comfy-core",
+              "ver": "0.39.2",
+              "Node name for S&R": "VAELoader",
+              "models": [
+                {
+                  "name": "marigold_v2_depth_log_stage2_vae.safetensors",
+                  "url": "https://huggingface.co/Comfy-Org/marigold-v2-0/resolve/main/vae/marigold_v2_depth_log_stage2_vae.safetensors",
+                  "directory": "vae"
+                }
+              ]
+            },
+            "widgets_values": [
+              "marigold_v2_depth_log_stage2_vae.safetensors"
+            ]
+          },
+          {
+            "id": 5,
+            "type": "ConditioningLoader",
+            "pos": [
+              647.4199863422364,
+              574.0816857981773
+            ],
+            "size": [
+              380,
+              60
+            ],
+            "flags": {},
+            "order": 2,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "conditioning_name",
+                "name": "conditioning_name",
+                "type": "COMBO",
+                "widget": {
+                  "name": "conditioning_name"
+                },
+                "link": null
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "CONDITIONING",
+                "name": "CONDITIONING",
+                "type": "CONDITIONING",
+                "links": [
+                  6
+                ]
+              }
+            ],
+            "properties": {
+              "cnr_id": "comfy-core",
+              "ver": "0.39.2",
+              "Node name for S&R": "ConditioningLoader",
+              "models": [
+                {
+                  "name": "marigold_v2_depth_conditioning.safetensors",
+                  "url": "https://huggingface.co/Comfy-Org/marigold-v2-0/resolve/main/embeddings/marigold_v2_depth_conditioning.safetensors",
+                  "directory": "embeddings"
+                }
+              ]
+            },
+            "widgets_values": [
+              "marigold_v2_depth_conditioning.safetensors"
+            ]
+          }
+        ],
+        "groups": [],
+        "links": [
+          {
+            "id": 1,
+            "origin_id": 2,
+            "origin_slot": 0,
+            "target_id": 3,
+            "target_slot": 0,
+            "type": "MODEL"
+          },
+          {
+            "id": 2,
+            "origin_id": 3,
+            "origin_slot": 0,
+            "target_id": 4,
+            "target_slot": 0,
+            "type": "MODEL"
+          },
+          {
+            "id": 3,
+            "origin_id": 4,
+            "origin_slot": 0,
+            "target_id": -20,
+            "target_slot": 0,
+            "type": "MODEL"
+          },
+          {
+            "id": 5,
+            "origin_id": 6,
+            "origin_slot": 0,
+            "target_id": -20,
+            "target_slot": 1,
+            "type": "VAE"
+          },
+          {
+            "id": 6,
+            "origin_id": 5,
+            "origin_slot": 0,
+            "target_id": -20,
+            "target_slot": 2,
+            "type": "CONDITIONING"
+          }
+        ],
+        "extra": {}
+      }
+    ]
+  },
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 1.2517516793584922,
+      "offset": [
+        -234.75041317202528,
+        239.1635042789436
+      ]
+    }
+  },
+  "version": 0.4
+}
