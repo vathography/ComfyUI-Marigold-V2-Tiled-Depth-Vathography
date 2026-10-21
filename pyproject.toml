@@ -1,6 +1,6 @@
 [project]
-name = "comfyui-marigold-v2-tiled-depth-vathography"
-description = "Tiled Marigold V2 depth for ComfyUI by Vathography: full-resolution depth maps from large photographs, on ComfyUI's native Marigold V2, with no extra installation."
+name = "marigold-v2-tiled-depth-vathography"
+description = "Tiled Marigold V2 depth map estimation from high-resolution photographs in ComfyUI"
 version = "1.0.0"
 license = { file = "LICENSE" }
 dependencies = ["kornia"]
