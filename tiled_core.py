@@ -26,9 +26,18 @@ TILE_DECOY_SCALE = 3.5
 M1_STRIP = 384                 # decoy strip on the right of the M1 (global) input
 M1_DECOY_SCALE = 2.5
 M1_BUDGET_MP = 3.2
+M1_MAX_LONG_EDGE = 2048        # largest long edge tried for the global grid
 DECOY_BOTTOM = 40              # px between the hand and the bottom of the strip
+
+# What differs between the two Marigold V2 depth models. Only the global pass changes: the see-through model
+# (Log-layered) reads glass better with a narrow bare strip (no hand) and a global long edge of at most 1920 px;
+# a bigger global made its glass worse. The tiles are the same for both.
+RECIPES = {
+    "depth": dict(m1_strip=M1_STRIP, m1_decoy_scale=M1_DECOY_SCALE, m1_max_long_edge=M1_MAX_LONG_EDGE),
+    "see-through": dict(m1_strip=64, m1_decoy_scale=0.0, m1_max_long_edge=1920),
+}
 STRETCH_LO, STRETCH_HI = 0.5, 99.5
-STEEP_X_MEDIAN = 75.0
+STEEP_X_MEDIAN = 68.0             # steepest segment / median segment slope at or above which a tile uses a straight-line fit
 
 
 def _log(log, msg):
@@ -39,10 +48,10 @@ def _log(log, msg):
 # ----------------------------------------------------------------------------- geometry
 
 
-def pin_for16(w, h, budget_mp=M1_BUDGET_MP, strip=M1_STRIP):
+def pin_for16(w, h, budget_mp=M1_BUDGET_MP, strip=M1_STRIP, max_long_edge=M1_MAX_LONG_EDGE):
     budget = budget_mp * 1e6
     r16 = lambda v: max(16, int(round(v / 16.0)) * 16)
-    for long_edge in range(2048, 255, -16):
+    for long_edge in range(max_long_edge, 255, -16):
         if h >= w:
             mh, mw = long_edge, r16(long_edge * w / h)
         else:

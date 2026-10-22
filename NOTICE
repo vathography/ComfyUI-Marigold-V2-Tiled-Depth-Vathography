@@ -2,9 +2,10 @@ ComfyUI-Marigold-V2-Tiled-Depth-Vathography
 Copyright (C) 2026 Karim Joseph Nassar (Vathography) - https://vathography.com
 Licensed under AGPL-3.0-only, with an additional permission for output (see LICENSE).
 
-This node contains no third-party source code and no model weights. It runs on
-ComfyUI's own native Marigold V2 support and uses the following works, which are
-installed separately and keep their own licenses:
+These nodes contain no third-party source code and no model weights. They run on
+ComfyUI's own native Marigold V2 support (the see-through loader decodes its 4-bit
+nf4 backbone in plain PyTorch) and use the following works, which are installed
+separately and keep their own licenses:
 
 - Marigold V2 (huawei-bayerlab) - Apache License 2.0
   Code:    https://github.com/huawei-bayerlab/marigold-v2
@@ -12,6 +13,10 @@ installed separately and keep their own licenses:
 
 - Qwen-Image-Edit-2509 (Qwen team, Alibaba) - Apache License 2.0
   The backbone model Marigold V2 runs on.
+
+- Marigold V2 see-through model files for ComfyUI - Apache License 2.0
+  https://huggingface.co/Vathography/marigold-v2-see-through-comfyui
+  Converted from Marigold V2 (depth/Log-layered) and Qwen-Image-Edit-2509.
 
 - ComfyUI (Comfy Org) - GNU General Public License v3.0
   Native Marigold V2 nodes and model loading.

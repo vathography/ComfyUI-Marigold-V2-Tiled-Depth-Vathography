@@ -21,21 +21,26 @@ def image_to_bgr_u8(image):
     return np.ascontiguousarray(u8[:, :, ::-1])
 
 
-def run_pipeline(photo, infer, tile=TILE, log=print, progress=None, merge_device="cpu", m1_budget=TC.M1_BUDGET_MP):
+def run_pipeline(photo, infer, tile=TILE, log=print, progress=None, merge_device="cpu", m1_budget=TC.M1_BUDGET_MP,
+                 recipe="depth"):
     H, W = photo.shape[:2]
     info = dict(canvas=[W, H], tile=tile)
+    R = TC.RECIPES[recipe]
 
-    mw, mh, mp = TC.pin_for16(W, H, m1_budget)
+    mw, mh, mp = TC.pin_for16(W, H, m1_budget, R["m1_strip"], R["m1_max_long_edge"])
     if mw is None:
         raise ValueError(f"{W}x{H}: no global grid fits the {m1_budget} MP budget")
-    m1_native = TC.build_m1_input(photo, mw, mh, TC.load_decoy(TC.M1_DECOY_SCALE))
+    m1_decoy = TC.load_decoy(R["m1_decoy_scale"]) if R["m1_decoy_scale"] > 0 else None
+    m1_native = TC.build_m1_input(photo, mw, mh, m1_decoy, R["m1_strip"])
     iw, ih = m1_native.shape[1], m1_native.shape[0]
     assert iw % 16 == 0 and ih % 16 == 0, (iw, ih)
     info.update(m1_grid=[mw, mh], m1_input=[iw, ih], m1_mp=round(mp, 2))
-    log(f"[tiled] photo {W}x{H} | global {mw}x{mh} + {TC.M1_STRIP}-px strip = {iw}x{ih} ({mp:.2f} MP, /16 grid)")
-    hand_h = TC.load_decoy(TC.M1_DECOY_SCALE)["obj"].shape[0]
-    if hand_h + TC.DECOY_BOTTOM > mh:
-        log(f"[tiled] wide photo: the global pass's hand is scaled down to fit ({hand_h} -> {mh - 2 * TC.DECOY_BOTTOM} px tall)")
+    log(f"[tiled] {recipe} model | photo {W}x{H} | global {mw}x{mh} + {R['m1_strip']}-px strip "
+        f"({'hand' if m1_decoy else 'no hand'}) = {iw}x{ih} ({mp:.2f} MP, /16 grid)")
+    if m1_decoy is not None:
+        hand_h = m1_decoy["obj"].shape[0]
+        if hand_h + TC.DECOY_BOTTOM > mh:
+            log(f"[tiled] wide photo: the global pass's hand is scaled down to fit ({hand_h} -> {mh - 2 * TC.DECOY_BOTTOM} px tall)")
 
     single = W < tile or H < tile
     if single:
@@ -104,7 +109,9 @@ class VathographyMarigoldTiledDepth:
     RETURN_NAMES = ("depth",)
     OUTPUT_TOOLTIPS = ("Depth map, 0..1, near = bright, at the photo's size.",)
     DESCRIPTION = ("Tiled Marigold V2 depth: a global pass plus 1536-px tiles, merged so the global holds the shape "
-                   "and the tiles add detail. Wire the Marigold V2 depth template's MODEL, VAE and CONDITIONING.")
+                   "and the tiles add detail. Wire the Marigold V2 depth template's MODEL, VAE and CONDITIONING. "
+                   "Works with the depth model and the see-through model (depth behind glass); the node recognises "
+                   "which one is loaded.")
 
     @classmethod
     def INPUT_TYPES(cls):
@@ -127,7 +134,8 @@ class VathographyMarigoldTiledDepth:
             raise ValueError(f"one image at a time: got a batch of {image.shape[0]}. Run the images one by one "
                              "(a batch would be stretched image by image).")
         sampling = NB.check_model(model)
-        warnings = []
+        recipe, warnings = NB.identify_model(model, vae)
+        log(f"[tiled] model: {recipe} ({NB.MODEL_FILES[recipe]})")
         if comfy.model_management.intermediate_dtype() == torch.float16:
             warnings.append("ComfyUI runs with --fp16-intermediates: the decoded predictions are fp16")
         photo = image_to_bgr_u8(image)
@@ -152,7 +160,7 @@ class VathographyMarigoldTiledDepth:
             return preds
 
         dev = comfy.model_management.get_torch_device()
-        out, info = run_pipeline(photo, infer, TILE, log=log, progress=progress, merge_device=dev)
+        out, info = run_pipeline(photo, infer, TILE, log=log, progress=progress, merge_device=dev, recipe=recipe)
         notes = []
         if binfo.get("encode_fallback") or binfo.get("decode_fallback"):
             notes.append(f"the VAE ran tiled (not enough GPU memory) for {binfo['encode_fallback']} encode(s) / "
@@ -160,6 +168,8 @@ class VathographyMarigoldTiledDepth:
         depth = torch.from_numpy(out)[None, :, :, None].repeat(1, 1, 1, 3).to(comfy.model_management.intermediate_device())
         wall = time.time() - T0
         lines = [f"Marigold V2 Tiled Depth - Vathography — {info['mode']}",
+                 f"model: {recipe} ({NB.MODEL_FILES[recipe]})"
+                 + (", nf4 backbone" if getattr(model.model, "vathography_model", None) == NB.SEE_THROUGH_MARKER else ""),
                  f"photo {info['canvas'][0]}x{info['canvas'][1]} | tile {info['tile']} + decoy strip {TC.TILE_STRIP} | "
                  f"global {info['m1_grid'][0]}x{info['m1_grid'][1]} ({info['m1_mp']} MP)",
                  f"inference {info['infer_s']} s | total {wall:.1f} s",

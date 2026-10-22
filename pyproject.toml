@@ -1,7 +1,7 @@
 [project]
 name = "marigold-v2-tiled-depth-vathography"
 description = "Tiled Marigold V2 depth map estimation from high-resolution photographs in ComfyUI"
-version = "1.0.0"
+version = "1.1.0"
 license = { file = "LICENSE" }
 dependencies = ["kornia"]
 
