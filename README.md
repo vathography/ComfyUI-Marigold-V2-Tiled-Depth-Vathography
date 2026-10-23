@@ -66,3 +66,5 @@ By Karim Joseph Nassar, developed with Claude Code.
 
 Thank you to the Marigold V2 team: Igor Pavlovic, Thiemo Wandel, Anton Obukhov, Luca Bartolomei, Andrey Davydov, Fabio Tosi, Matteo Poggi, Sabine Süsstrunk, Dengxin Dai.
 https://huggingface.co/spaces/huawei-bayerlab/marigold-v2-web
+<img width="1920" height="1080" alt="base_depth_map_relief_increase" src="https://github.com/user-attachments/assets/edb865f6-6586-4462-882e-c035e1198fa3" />
+<img width="1920" height="1080" alt="photograph_base_model_see_through_model" src="https://github.com/user-attachments/assets/9cb1a8c0-1fac-4795-809c-dc7b7c5890b6" />
