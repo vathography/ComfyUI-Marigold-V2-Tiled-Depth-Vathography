@@ -1,4 +1,3 @@
-import os
 import time
 
 import numpy as np
@@ -61,13 +60,6 @@ def run_pipeline(photo, infer, tile=TILE, log=print, progress=None, merge_device
     info["infer_s"] = round(time.time() - t0, 1)
     assert len(preds) == len(inputs), (len(preds), len(inputs))
     del inputs
-    dump = os.environ.get("VATHOGRAPHY_TILED_DUMP")         # diagnostic only: raw predictions as .npy, nothing else changes
-    if dump:
-        os.makedirs(dump, exist_ok=True)
-        names = ["m1"] + ([t["name"] for t in plan["tiles"]] if plan else [])
-        for nm, p in zip(names, preds):
-            np.save(os.path.join(dump, nm + ".npy"), p)
-        log(f"[tiled] DUMP: {len(names)} raw predictions -> {dump}")
 
     # ---- the global: strip cropped, resized to the canvas
     p1 = preds[0]
@@ -86,8 +78,6 @@ def run_pipeline(photo, infer, tile=TILE, log=print, progress=None, merge_device
         Tm, rows = TC.mosaic(G, plan, tp, log=log)
         del tp
         S, minfo = TC.laplacian_merge(G, Tm, TC.RADIUS, merge_device)
-        if dump:
-            np.save(os.path.join(dump, "merged_r32.npy"), S)
         del Tm
         info["tiles_near_rail_max_pct"] = round(100 * max(r["near"] for r in rows), 3)
         info["affine_fallback"] = [f"{r['name']} ({r['steep_x_median']:.0f}x median)" for r in rows if r["affine_fallback"]]

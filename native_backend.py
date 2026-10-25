@@ -26,36 +26,6 @@ class _FallbackWatch(logging.Handler):
             self.hits.append(msg)
 
 
-class _ForceFallback:
-
-    def __init__(self, vae, which):
-        self.m, self.which = vae.first_stage_model, which
-
-    def __enter__(self):
-        self.orig = getattr(self.m, self.which)
-        armed = {"on": True}
-
-        def once(*a, **k):
-            if armed["on"]:
-                armed["on"] = False
-                raise comfy.model_management.OOM_EXCEPTION("diagnostic: forced once to exercise the tiled-VAE fallback")
-            return self.orig(*a, **k)
-        setattr(self.m, self.which, once)
-        return self
-
-    def __exit__(self, *exc):
-        setattr(self.m, self.which, self.orig)
-        return False
-
-
-def _maybe_force(vae, which):
-    import contextlib
-    import os
-    if os.environ.get("VATHOGRAPHY_TILED_FORCE_VAE_FALLBACK") == "1":
-        return _ForceFallback(vae, which)
-    return contextlib.nullcontext()
-
-
 def check_model(model):
     """The template's ModelSamplingAuraFlow(sampling = img_to_img_velocity) step must have been applied: without it
     the one-step formula is wrong and the map is garbage. Returns the sampling object's class name."""
@@ -160,8 +130,7 @@ def run(model, vae, conditioning, inputs, log=None, progress=None):
         for k, x in enumerate(inputs):
             comfy.model_management.throw_exception_if_processing_interrupted()
             before = len(watch.hits)
-            with _maybe_force(vae, "encode"):
-                lat = vae.encode(to_image(x))
+            lat = vae.encode(to_image(x))
             info["encode_fallback"] += len(watch.hits) - before
             latents.append(lat.to(comfy.model_management.intermediate_device()))
             done += 1
@@ -197,8 +166,7 @@ def run(model, vae, conditioning, inputs, log=None, progress=None):
         for k, s in enumerate(samples):
             comfy.model_management.throw_exception_if_processing_interrupted()
             before = len(watch.hits)
-            with _maybe_force(vae, "decode"):
-                img = vae.decode(s)
+            img = vae.decode(s)
             info["decode_fallback"] += len(watch.hits) - before
             if img.ndim == 5:
                 img = img.reshape(-1, img.shape[-3], img.shape[-2], img.shape[-1])
