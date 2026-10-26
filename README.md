@@ -3,7 +3,11 @@
 
 # ComfyUI-Marigold-V2-Tiled-Depth-Vathography
 
-Custom node pack for full-resolution depth maps from high-resolution photographs, estimated tile by tile, for the Vathography art practice. This repo is for the artistic application of the Marigold V2 model and is not affiliated with the original authors.
+Custom node pack for full-resolution depth maps from high-resolution photographs, estimated tile by tile, for the Vathography art practice. This repo is for the artistic application of the Marigold V2 model and is not affiliated with the original Marigold V2 authors. The nodes are free and the outputs are free to use commercially.
+
+---
+
+## Vathography
 
 **The Vathography practice:** a photograph is distilled to a single element: the volume of the scene, creating a unique artwork, composed at capture, focused and shaped in post by the artist.
 
