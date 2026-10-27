@@ -55,6 +55,8 @@ No extra Python packages required. Needs ComfyUI v0.36.0 or newer.
 
 **License:** AGPL-3.0-only. Free nodes; the depth maps they produce are free to use, for personal and commercial work. See `LICENSE`.
 
+**What's new in 1.3.0:** Depth Relief Increase also takes colour exports: the relief follows the colour ramp and the colours stay on it.
+
 **What's new in 1.2.0:** the Depth Relief Increase node.
 
 **What's new in 1.1.0:** see-through depth (the loader node, its example workflow and model files). The straight-line fit for steep tiles now starts at 68× instead of 75×, so a few depth maps can differ slightly from 1.0.0.

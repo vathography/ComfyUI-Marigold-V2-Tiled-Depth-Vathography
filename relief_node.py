@@ -7,9 +7,11 @@ import comfy.model_management
 import comfy.utils
 
 from . import relief as RL
+from . import relief_colour as RC
 
 GREY_TOL = 1e-6                # max channel difference for an IMAGE to count as a grey depth map
 WORK_BYTES_PER_PX = 48         # GPU working set of the filter, measured shape: about 12 float32 copies of the map
+COLOUR_BYTES_PER_PX = 160      # colour path on top: the picture, its OkLab copy and the output in float64
 
 
 class VathographyDepthReliefIncrease:
@@ -29,8 +31,9 @@ class VathographyDepthReliefIncrease:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "depth": ("IMAGE", {"tooltip": "A grey picture: the Blender add-on's export (PNG or EXR, grey ramp) "
-                                               "or a raw depth map. Colour images are refused."}),
+                "depth": ("IMAGE", {"tooltip": "The Blender add-on's export (PNG or EXR) or a raw depth map. A colour "
+                                               "export works too: the relief follows its colour ramp and the colours "
+                                               "stay on the ramp."}),
                 "input": (list(RL.SOURCES), {"default": RL.SOURCES[0],
                                              "tooltip": "What is loaded. 'Blender export, EXR (linear)': the add-on's "
                                                         "EXR. 'Blender export, PNG (sRGB)': the add-on's PNG (8 or 16-bit). "
@@ -61,8 +64,8 @@ class VathographyDepthReliefIncrease:
             if img.shape[-1] >= 3:
                 spread = float(max(np.abs(img[..., 0] - img[..., 1]).max(), np.abs(img[..., 0] - img[..., 2]).max()))
                 if spread > GREY_TOL:
-                    raise ValueError(f"image {b} is a colour image (channels differ by up to {spread:.4f}): this node "
-                                     "takes a grey depth map, such as the Marigold V2 Tiled Depth output.")
+                    outs.append(torch.from_numpy(self._colour(img[..., :3], b, spread, input, sigma_r, dev, log)))
+                    continue
             d = np.ascontiguousarray(img[..., 0], dtype=np.float32)
             H, W = d.shape
             if not np.isfinite(d).all():
@@ -92,11 +95,44 @@ class VathographyDepthReliefIncrease:
                 log(f"[relief] image {b}: levels kept (display units): black {lv['in_lo']:.5f} / white {lv['in_hi']:.5f} "
                     f"<- relief {lv['got_lo']:.5f} / {lv['got_hi']:.5f} on {lv['n_lo']} / {lv['n_hi']} px; halo clipped "
                     f"{100 * lv['clipped']:.3f} % | out {float(r.min()):.4f}..{float(r.max()):.4f}")
-            outs.append(torch.from_numpy(r))
-        out = torch.stack(outs)[..., None].repeat(1, 1, 1, 3).to(comfy.model_management.intermediate_device())
+            outs.append(torch.from_numpy(r)[..., None].repeat(1, 1, 3))
+        out = torch.stack(outs).to(comfy.model_management.intermediate_device())
         log(f"[relief] EXIT depth {tuple(out.shape)} range {float(out.min()):.3f}..{float(out.max()):.3f} | "
             f"total {time.time() - T0:.1f} s")
         return (out,)
+
+    @staticmethod
+    def _colour(rgb, b, spread, input, sigma_r, dev, log):
+        H, W, _ = rgb.shape
+        log(f"[relief] image {b}: colour picture (channels differ by up to {spread:.4f}) -> relief along its colour ramp")
+        comfy.model_management.free_memory(H * W * (WORK_BYTES_PER_PX + COLOUR_BYTES_PER_PX), dev)
+        pbar = comfy.utils.ProgressBar(1)
+
+        def tick(done, total):
+            comfy.model_management.throw_exception_if_processing_interrupted()
+            pbar.update_absolute(done, total)
+
+        t = time.time()
+        try:
+            r, info = RC.relief_colour(rgb, sigma_r, input, device=dev, tick=tick)
+        except comfy.model_management.OOM_EXCEPTION as e:
+            comfy.model_management.soft_empty_cache()
+            raise RuntimeError(f"the GPU ran out of memory on a {W}x{H} colour picture ({str(e)[:120]}); about "
+                               f"{H * W * (WORK_BYTES_PER_PX + COLOUR_BYTES_PER_PX) / 2 ** 30:.1f} GB are needed. "
+                               "Close other programs using the GPU and run again.") from e
+        comfy.model_management.soft_empty_cache()
+        log(f"[relief] image {b}: {W}x{H} | path '{info['path']}' | off the colour curve {100 * info['off_share']:.2f} % "
+            f"(fallback above {100 * RC.OFF_SHARE_MAX:.0f} %) | curve length {info['curve_len']:.4f} OkLab | "
+            f"{info['samples']} samples x {info['levels']} levels | out of range {100 * info['out_of_range']:.3f} % | "
+            f"{time.time() - t:.1f} s on {dev}")
+        if info["path"] == "brightness":
+            log(f"[relief] image {b}: WARNING more than {100 * RC.OFF_SHARE_MAX:.0f} % of the picture is off one colour "
+                "ramp: the relief was increased on its brightness instead, colours scaled with it")
+        if "levels_kept" in info:
+            lv = info["levels_kept"]
+            log(f"[relief] image {b}: ends kept: {lv['in_lo']:.5f} / {lv['in_hi']:.5f} <- {lv['got_lo']:.5f} / "
+                f"{lv['got_hi']:.5f} on {lv['n_lo']} / {lv['n_hi']} px; halo clipped {100 * lv['clipped']:.3f} %")
+        return r
 
 
 NODE_CLASS_MAPPINGS = {"VathographyDepthReliefIncrease": VathographyDepthReliefIncrease}
